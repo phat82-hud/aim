@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control Panel</title>
+  <style>
+    :root {
+      --bg-1: #07111f;
+      --bg-2: #0f1b2d;
+      --card: rgba(255, 255, 255, 0.08);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --text: #eef5ff;
+      --muted: #99abc5;
+      --accent: #59c3ff;
+      --accent-2: #7dffcb;
+      --danger: #ff6b81;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      --radius: 24px;
+      --radius-sm: 16px;
+      --blur: blur(18px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(89, 195, 255, 0.18), transparent 35%),
+        radial-gradient(circle at top right, rgba(125, 255, 203, 0.12), transparent 30%),
+        linear-gradient(160deg, var(--bg-1), var(--bg-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: min(1120px, 100%);
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 22px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      backdrop-filter: var(--blur);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .left {
+      padding: 26px;
+    }
+
+    .right {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 20px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(89, 195, 255, 0.14), rgba(125, 255, 203, 0.08));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .hero h1 {
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .status-chip {
+      min-width: 160px;
+      padding: 14px 18px;
+      border-radius: 999px;
+      text-align: center;
+      font-weight: 700;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--accent-2);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .feature {
+      position: relative;
+      padding: 20px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+    }
+
+    .feature:hover {
+      transform: translateY(-3px);
+      border-color: rgba(89, 195, 255, 0.35);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    .feature.active {
+      border-color: rgba(125, 255, 203, 0.45);
+      box-shadow: inset 0 0 0 1px rgba(125, 255, 203, 0.18), 0 18px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .feature-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 24px;
+      user-select: none;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .controls {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(0,0,0,0.12);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .switch-label {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .switch {
+      position: relative;
+      width: 62px;
+      height: 36px;
+      flex: 0 0 auto;
+    }
+
+    .switch input {
+      display: none;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.15);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: .24s ease;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: #fff;
+      transition: .24s ease;
+      box-shadow: 0 5px 18px rgba(0,0,0,0.25);
+    }
+
+    .switch input:checked + .slider {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(26px);
+    }
+
+    .range-wrap {
+      display: grid;
+      gap: 8px;
+    }
+
+    .range-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      appearance: none;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: white;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .btn {
+      border: 0;
+      outline: 0;
+      cursor: pointer;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-weight: 800;
+      font-size: 14px;
+      transition: transform .18s ease, opacity .18s ease, box-shadow .18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      color: #03111d;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 12px 24px rgba(89, 195, 255, 0.24);
+    }
+
+    .btn.secondary {
+      color: var(--text);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .btn.danger {
+      color: white;
+      background: linear-gradient(135deg, #ff7a8f, #ff4f71);
+      box-shadow: 0 12px 24px rgba(255, 79, 113, 0.22);
+    }
+
+    .mini-card {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .mini-card h3 {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(0,0,0,0.12);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .stat .k {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .stat .v {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .log {
+      min-height: 220px;
+      max-height: 320px;
+      overflow: auto;
+      display: grid;
+      gap: 10px;
+      padding-right: 4px;
+    }
+
+    .log-item {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(0,0,0,0.12);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-size: 13px;
+      line-height: 1.55;
+      color: #dfeaff;
+    }
+
+    .log-item b {
+      color: var(--accent-2);
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="panel left">
+      <div class="hero">
+        <div>
+          <h1>Smart Control Panel</h1>
+          <p>Giao diện bật/tắt nhanh cho từng chế độ, có lưu trạng thái và tự gọi bridge native C++ khi khởi động.</p>
+        </div>
+        <div class="status-chip" id="masterStatus">READY</div>
+      </div>
+
+      <div class="grid">
+        <article class="feature" id="card-dam_tam">
+          <div class="feature-head">
+            <div>
+              <div class="title">Đầm tâm</div>
+              <div class="subtitle">Bật chế độ giữ tâm ổn định, ưu tiên cảm giác kéo chắc tay.</div>
+            </div>
+            <div class="icon">🎯</div>
+          </div>
+
+          <div class="controls">
+            <div class="switch-row">
+              <span class="switch-label">Khởi động</span>
+              <label class="switch">
+                <input type="checkbox" id="toggle-dam_tam" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="range-wrap">
+              <div class="range-head">
+                <span>Độ mạnh</span>
+                <span id="value-dam_tam">82%</span>
+              </div>
+              <input type="range" id="range-dam_tam" min="0" max="100" value="82" />
+            </div>
+          </div>
+        </article>
+
+        <article class="feature" id="card-fix_rung">
+          <div class="feature-head">
+            <div>
+              <div class="title">Fix rung</div>
+              <div class="subtitle">Bật chế độ triệt rung tối đa, ưu tiên độ mượt và giảm dao động.</div>
+            </div>
+            <div class="icon">🛡️</div>
+          </div>
+
+          <div class="controls">
+            <div class="switch-row">
+              <span class="switch-label">Khởi động</span>
+              <label class="switch">
+                <input type="checkbox" id="toggle-fix_rung" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="range-wrap">
+              <div class="range-head">
+                <span>Độ mạnh</span>
+                <span id="value-fix_rung">90%</span>
+              </div>
+              <input type="range" id="range-fix_rung" min="0" max="100" value="90" />
+            </div>
+          </div>
+        </article>
+
+        <article class="feature" id="card-nhe_tam">
+          <div class="feature-head">
+            <div>
+              <div class="title">Nhẹ tâm</div>
+              <div class="subtitle">Bật chế độ kéo nhẹ, tăng độ linh hoạt và độ thoáng khi rê.</div>
+            </div>
+            <div class="icon">⚡</div>
+          </div>
+
+          <div class="controls">
+            <div class="switch-row">
+              <span class="switch-label">Khởi động</span>
+              <label class="switch">
+                <input type="checkbox" id="toggle-nhe_tam" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="range-wrap">
+              <div class="range-head">
+                <span>Độ mạnh</span>
+                <span id="value-nhe_tam">74%</span>
+              </div>
+              <input type="range" id="range-nhe_tam" min="0" max="100" value="74" />
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn primary" id="btn-start-all">Bật tất cả</button>
+        <button class="btn secondary" id="btn-save">Lưu cấu hình</button>
+        <button class="btn danger" id="btn-stop-all">Tắt tất cả</button>
+      </div>
+    </section>
+
+    <aside class="panel right">
+      <div class="mini-card">
+        <h3>Tổng quan</h3>
+        <div class="stats">
+          <div class="stat">
+            <div class="k">Tính năng bật</div>
+            <div class="v" id="stat-enabled">0</div>
+          </div>
+          <div class="stat">
+            <div class="k">Mức trung bình</div>
+            <div class="v" id="stat-average">82%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mini-card">
+        <h3>Nhật ký</h3>
+        <div class="log" id="log"></div>
+      </div>
+
+      <div class="mini-card footer-note">
+        Native bridge ưu tiên:
+        <br>1. <b>window.cppBridge.launchFeature(name, enabled, strength)</b>
+        <br>2. Custom URL scheme: <b>vibecoder://launch?feature=...&enabled=...&strength=...</b>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const FEATURES = [
+      { key: "dam_tam", label: "Đầm tâm", defaultStrength: 82 },
+      { key: "fix_rung", label: "Fix rung", defaultStrength: 90 },
+      { key: "nhe_tam", label: "Nhẹ tâm", defaultStrength: 74 }
+    ];
+
+    const state = {};
+    const logEl = document.getElementById("log");
+    const masterStatus = document.getElementById("masterStatus");
+    const statEnabled = document.getElementById("stat-enabled");
+    const statAverage = document.getElementById("stat-average");
+
+    function addLog(message) {
+      const time = new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      const div = document.createElement("div");
+      div.className = "log-item";
+      div.innerHTML = `<b>${time}</b> — ${message}`;
+      logEl.prepend(div);
+    }
+
+    function saveState() {
+      localStorage.setItem("smart-control-panel-state", JSON.stringify(state));
+      addLog("Đã lưu cấu hình cục bộ.");
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem("smart-control-panel-state");
+      if (!raw) {
+        FEATURES.forEach(f => {
+          state[f.key] = { enabled: false, strength: f.defaultStrength };
+        });
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(raw);
+        FEATURES.forEach(f => {
+          state[f.key] = {
+            enabled: !!parsed?.[f.key]?.enabled,
+            strength: Number.isFinite(parsed?.[f.key]?.strength) ? parsed[f.key].strength : f.defaultStrength
+          };
+        });
+      } catch {
+        FEATURES.forEach(f => {
+          state[f.key] = { enabled: false, strength: f.defaultStrength };
+        });
+      }
+    }
+
+    function updateStats() {
+      const enabledCount = FEATURES.filter(f => state[f.key].enabled).length;
+      const average = Math.round(
+        FEATURES.reduce((sum, f) => sum + Number(state[f.key].strength || 0), 0) / FEATURES.length
+      );
+
+      statEnabled.textContent = enabledCount;
+      statAverage.textContent = `${average}%`;
+      masterStatus.textContent = enabledCount > 0 ? "RUNNING" : "READY";
+    }
+
+    function renderFeature(key) {
+      const cfg = state[key];
+      const toggle = document.getElementById(`toggle-${key}`);
+      const range = document.getElementById(`range-${key}`);
+      const value = document.getElementById(`value-${key}`);
+      const card = document.getElementById(`card-${key}`);
+
+      toggle.checked = cfg.enabled;
+      range.value = cfg.strength;
+      value.textContent = `${cfg.strength}%`;
+      card.classList.toggle("active", cfg.enabled);
+    }
+
+    function renderAll() {
+      FEATURES.forEach(f => renderFeature(f.key));
+      updateStats();
+    }
+
+    async function launchNativeFeature(key) {
+      const cfg = state[key];
+      const payload = {
+        feature: key,
+        enabled: cfg.enabled,
+        strength: cfg.strength
+      };
+
+      try {
+        if (window.cppBridge && typeof window.cppBridge.launchFeature === "function") {
+          await window.cppBridge.launchFeature(payload.feature, payload.enabled, payload.strength);
+          addLog(`<b>${displayName(key)}</b> đã gọi bridge C++ thành công.`);
+          return;
+        }
+
+        const url = `vibecoder://launch?feature=${encodeURIComponent(payload.feature)}&enabled=${payload.enabled ? 1 : 0}&strength=${payload.strength}`;
+        const iframe = document.createElement("iframe");
+        iframe.style.display = "none";
+        iframe.src = url;
+        document.body.appendChild(iframe);
+        setTimeout(() => iframe.remove(), 800);
+
+        addLog(`<b>${displayName(key)}</b> đã gửi lệnh native qua URL scheme.`);
+      } catch (err) {
+        addLog(`<b>${displayName(key)}</b> lỗi bridge: ${String(err)}`);
+      }
+    }
+
+    function displayName(key) {
+      return FEATURES.find(f => f.key === key)?.label || key;
+    }
+
+    function bindFeature(key) {
+      const toggle = document.getElementById(`toggle-${key}`);
+      const range = document.getElementById(`range-${key}`);
+
+      toggle.addEventListener("change", async () => {
+        state[key].enabled = toggle.checked;
+        renderFeature(key);
+        updateStats();
+        localStorage.setItem("smart-control-panel-state", JSON.stringify(state));
+        addLog(`${displayName(key)} ${toggle.checked ? "đã bật" : "đã tắt"}.`);
+        await launchNativeFeature(key);
+      });
+
+      range.addEventListener("input", () => {
+        state[key].strength = Number(range.value);
+        document.getElementById(`value-${key}`).textContent = `${state[key].strength}%`;
+        updateStats();
+      });
+
+      range.addEventListener("change", async () => {
+        localStorage.setItem("smart-control-panel-state", JSON.stringify(state));
+        addLog(`${displayName(key)} cập nhật mức ${state[key].strength}%.`);
+        if (state[key].enabled) {
+          await launchNativeFeature(key);
+        }
+      });
+    }
+
+    document.getElementById("btn-start-all").addEventListener("click", async () => {
+      for (const f of FEATURES) {
+        state[f.key].enabled = true;
+        renderFeature(f.key);
+        await launchNativeFeature(f.key);
+      }
+      updateStats();
+      localStorage.setItem("smart-control-panel-state", JSON.stringify(state));
+      addLog("Đã bật toàn bộ chế độ.");
+    });
+
+    document.getElementById("btn-stop-all").addEventListener("click", async () => {
+      for (const f of FEATURES) {
+        state[f.key].enabled = false;
+        renderFeature(f.key);
+        await launchNativeFeature(f.key);
+      }
+      updateStats();
+      localStorage.setItem("smart-control-panel-state", JSON.stringify(state));
+      addLog("Đã tắt toàn bộ chế độ.");
+    });
+
+    document.getElementById("btn-save").addEventListener("click", saveState);
+
+    loadState();
+    renderAll();
+    FEATURES.forEach(f => bindFeature(f.key));
+    addLog("Giao diện đã sẵn sàng.");
+  </script>
+</body>
+</html>
